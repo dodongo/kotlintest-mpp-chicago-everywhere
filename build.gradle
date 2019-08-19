@@ -1,0 +1,137 @@
+buildscript {
+
+    ext.kotlin_version = '1.3.41'
+    ext.kotlintestVersion = "4.0.0.2480-SNAPSHOT"
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'org.jetbrains.kotlin.multiplatform' version '1.3.41'
+    id "com.moowork.node" version "1.3.1"
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+kotlin {
+
+    jvm()
+    js()
+
+    sourceSets {
+
+        commonMain {
+            dependencies {
+                implementation kotlin("stdlib-common")
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation "io.kotlintest:kotlintest-assertions:$kotlintestVersion"
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation kotlin("stdlib-jdk8")
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation "io.kotlintest:kotlintest-assertions-jvm:$kotlintestVersion"
+                implementation "io.kotlintest:kotlintest-core-jvm:$kotlintestVersion"
+                implementation "io.kotlintest:kotlintest-runner-jvm-jvm:$kotlintestVersion"
+                implementation "io.kotlintest:kotlintest-runner-junit5-jvm:$kotlintestVersion"
+            }
+        }
+
+        jsMain {
+            dependencies {
+                implementation kotlin("stdlib-js")
+            }
+        }
+
+        jsTest {
+            dependencies {
+                implementation kotlin("test-js")
+                implementation "io.kotlintest:kotlintest-runner-js-js:$kotlintestVersion"
+                implementation "io.kotlintest:kotlintest-assertions-js:$kotlintestVersion"
+            }
+        }
+    }
+}
+
+compileKotlinJs.configure {
+    kotlinOptions {
+        moduleKind = 'commonjs'
+    }
+}
+
+compileTestKotlinJs.configure {
+    kotlinOptions {
+        moduleKind = 'commonjs'
+    }
+}
+
+task copyJsDependencies(type: Copy, dependsOn: compileTestKotlinJs) {
+    from compileKotlinJs.destinationDir
+    into "${buildDir}/node_modules"
+
+    def configuration = configurations.jsTestRuntimeClasspath
+    from(files {
+        configuration.collect { File file ->
+            file.name.endsWith(".jar")
+                    ? zipTree(file.absolutePath).matching {
+                include '*.js'
+                include '*.js.map'
+            }
+                    : files()
+        }
+    }.builtBy(configuration))
+}
+
+node {
+    download = true
+}
+
+task installQunit(type: NpmTask) {
+    args = ['install', 'qunitjs']
+}
+
+task runQunit(type: NodeTask, dependsOn: [compileTestKotlinJs, copyJsDependencies, installQunit]) {
+    script = file('node_modules/qunitjs/bin/qunit')
+    args = [projectDir.toPath().relativize(file(compileTestKotlinJs.outputFile).toPath())]
+}
+
+task installMocha(type: NpmTask) {
+    args = ['install', 'mocha']
+}
+
+task runMocha(type: NodeTask, dependsOn: [installMocha, compileTestKotlinJs, copyJsDependencies]) {
+    script = file('node_modules/mocha/bin/mocha')
+    args = ["kotlintest-plugin.js", compileTestKotlinJs.outputFile]
+}
+
+jsTest.dependsOn runMocha
+
+jvmTest {
+    useJUnitPlatform()
+
+    // show standard out and standard error of the test JVM(s) on the console
+    testLogging.showStandardStreams = true
+
+    testLogging {
+        events "PASSED", "FAILED", "SKIPPED", "STANDARD_OUT", "STANDARD_ERROR"
+        exceptionFormat = 'full'
+    }
+}
