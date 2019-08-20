@@ -1,7 +1,7 @@
 buildscript {
 
     ext.kotlin_version = '1.3.41'
-    ext.kotlintestVersion = "4.0.0.2480-SNAPSHOT"
+    ext.kotlintestVersion = "4.0.0.2485-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -36,7 +36,8 @@ kotlin {
 
         commonTest {
             dependencies {
-                implementation "io.kotlintest:kotlintest-assertions:$kotlintestVersion"
+                api "io.kotlintest:kotlintest-core:$kotlintestVersion"
+                api "io.kotlintest:kotlintest-assertions:$kotlintestVersion"
             }
         }
 
@@ -48,8 +49,6 @@ kotlin {
 
         jvmTest {
             dependencies {
-                implementation "io.kotlintest:kotlintest-assertions-jvm:$kotlintestVersion"
-                implementation "io.kotlintest:kotlintest-core-jvm:$kotlintestVersion"
                 implementation "io.kotlintest:kotlintest-runner-jvm-jvm:$kotlintestVersion"
                 implementation "io.kotlintest:kotlintest-runner-junit5-jvm:$kotlintestVersion"
             }
@@ -65,7 +64,6 @@ kotlin {
             dependencies {
                 implementation kotlin("test-js")
                 implementation "io.kotlintest:kotlintest-runner-js-js:$kotlintestVersion"
-                implementation "io.kotlintest:kotlintest-assertions-js:$kotlintestVersion"
             }
         }
     }
