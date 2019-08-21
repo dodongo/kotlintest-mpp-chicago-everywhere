@@ -1,7 +1,7 @@
 buildscript {
 
     ext.kotlin_version = '1.3.41'
-    ext.kotlintestVersion = "4.0.0.2494-SNAPSHOT"
+    ext.kotlintestVersion = "4.0.0.2496-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -123,14 +123,6 @@ task runMocha(type: NodeTask, dependsOn: [installMocha, compileTestKotlinJs, cop
 
 jsTest.dependsOn runMocha
 
-//task "yarn_install"(type: DefaultTask) {
-//    doLast {
-//        // ensure that node is downloaded by kotlin plugin (by default into ~/.gradle/nodejs)
-//        val nodeJs = NodeJsPlugin.apply(project.rootProject)
-//        YarnSimple.yarnExec(project, file("${ngDir}"), "yarn_install", "install", "--cwd", "--no-bin-links")
-//    }
-//}
-
 jvmTest {
     useJUnitPlatform()
 
@@ -140,13 +132,5 @@ jvmTest {
     testLogging {
         events "PASSED", "FAILED", "SKIPPED", "STANDARD_OUT", "STANDARD_ERROR"
         exceptionFormat = 'full'
-    }
-}
-
-repositories.whenObjectAdded {
-    if ( IvyArtifactRepository) {
-        metadataSources {
-            artifact()
-        }
     }
 }
