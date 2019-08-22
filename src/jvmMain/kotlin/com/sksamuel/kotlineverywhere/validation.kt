@@ -1,16 +1,14 @@
 package com.sksamuel.kotlineverywhere
 
-import java.time.LocalDate
+import java.util.regex.Pattern
 
-val emailRegex = ".*?@.*?".toRegex()
-val socialRegex = "\\d{3}-\\d{3}-\\d{4}".toRegex()
+val emailRegex = Pattern.compile(".+?@.+?")
+val socialRegex = Pattern.compile("\\d{3}-\\d{3}-\\d{4}")
 
-actual fun validateEmail(email: String): Boolean = emailRegex.matches(email)
+actual fun validateSocial(ssn: String): Boolean = socialRegex.matcher(ssn).matches()
 
-actual fun validateSocial(ssn: String): Boolean = socialRegex.matches(ssn)
+actual fun validateEmail(email: String): Boolean = emailRegex.matcher(email).matches()
 
-actual fun validateAge(dob: String, minAge: Long): Boolean = try {
-  !LocalDate.parse(dob).isAfter(LocalDate.now().minusYears(minAge))
-} catch (e: Exception) {
-  false
-}
+
+val usernameRegex = "[a-zA-Z0-9]+".toRegex()
+actual fun validateUsername(username: String): Boolean = usernameRegex.matches(username.trim())

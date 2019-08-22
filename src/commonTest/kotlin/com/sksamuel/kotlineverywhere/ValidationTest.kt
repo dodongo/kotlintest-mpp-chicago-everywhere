@@ -1,36 +1,34 @@
 package com.sksamuel.kotlineverywhere
 
 import io.kotlintest.core.QuickSpec
+import io.kotlintest.inspectors.forAll
 import io.kotlintest.shouldBe
 
 class ValidationTest : QuickSpec({
 
-  t("social regex should pass valid numbers") {
+  test("social validation") {
+
     validateSocial("123-456-1111") shouldBe true
-    validateSocial("999-333-4444") shouldBe true
+
+    listOf("a12-456-cccc", "", "123-4561117", "122", "1234567899").forAll {
+      validateSocial(it) shouldBe false
+    }
   }
 
-  t("social regex should fail invalid numbers") {
-    validateSocial("a12-456-1111") shouldBe false
-    validateSocial("a12-456-cccc") shouldBe false
-    validateSocial("123456-1111") shouldBe false
-    validateSocial("123-4561117") shouldBe false
-    validateSocial("122") shouldBe false
-    validateSocial("") shouldBe false
-    validateSocial("1234567899") shouldBe false
-  }
+  test("email validation") {
 
-  t("email regex should require an @ and tld") {
-    validateSocial("a@a.com") shouldBe true
-    validateSocial("sam@sam.com") shouldBe true
-  }
+    listOf("a@a.com", "sam@sam.com").forAll {
+      validateEmail(it) shouldBe true
+    }
 
-  t("email regex should fail without tld") {
-    validateSocial("a@a") shouldBe false
-    validateSocial("@a") shouldBe false
-  }
-
-  t("email regex should fail without an @") {
-    validateSocial("a.com") shouldBe false
+    listOf("a@", "@a", "a.com").forAll {
+      validateEmail(it) shouldBe false
+    }
   }
 })
+
+//test("validate username") {
+//  assertAll(Gen.string(maxSize = 16)) { username ->
+//    validateUsername(username) shouldBe true
+//  }
+//}
