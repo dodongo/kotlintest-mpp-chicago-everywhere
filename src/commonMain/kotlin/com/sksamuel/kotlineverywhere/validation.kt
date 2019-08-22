@@ -4,4 +4,4 @@ expect fun validateEmail(email: String): Boolean
 
 expect fun validateSocial(ssn: String): Boolean
 
-expect fun validateUsername(username: String): Boolean
+fun validatePassword(password: String): Boolean = password.length in 8..16

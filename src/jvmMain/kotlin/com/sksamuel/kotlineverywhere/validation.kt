@@ -10,5 +10,5 @@ actual fun validateSocial(ssn: String): Boolean = socialRegex.matcher(ssn).match
 actual fun validateEmail(email: String): Boolean = emailRegex.matcher(email).matches()
 
 
-val usernameRegex = "[a-zA-Z0-9]+".toRegex()
-actual fun validateUsername(username: String): Boolean = usernameRegex.matches(username.trim())
+val usernameRegex = Pattern.compile("[a-zA-Z0-9]+")
+actual fun validateUsername(username: String): Boolean = usernameRegex.matcher(username.trim()).matches()

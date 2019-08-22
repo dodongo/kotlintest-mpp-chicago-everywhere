@@ -2,6 +2,9 @@ package com.sksamuel.kotlineverywhere
 
 import io.kotlintest.core.QuickSpec
 import io.kotlintest.inspectors.forAll
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.assertAll
+import io.kotlintest.properties.string
 import io.kotlintest.shouldBe
 
 class ValidationTest : QuickSpec({
@@ -25,10 +28,11 @@ class ValidationTest : QuickSpec({
       validateEmail(it) shouldBe false
     }
   }
+
+  test("validate password") {
+    assertAll(Gen.string(minSize = 8, maxSize = 16)) { username ->
+      validatePassword(username) shouldBe true
+    }
+  }
 })
 
-//test("validate username") {
-//  assertAll(Gen.string(maxSize = 16)) { username ->
-//    validateUsername(username) shouldBe true
-//  }
-//}
