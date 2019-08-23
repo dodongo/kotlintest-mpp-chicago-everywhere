@@ -2,6 +2,7 @@ package com.sksamuel.kotlineverywhere
 
 import io.kotlintest.core.QuickSpec
 import io.kotlintest.inspectors.forAll
+import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.assertAll
 import io.kotlintest.properties.string
@@ -33,6 +34,12 @@ class ValidationTest : QuickSpec({
     assertAll(Gen.string(minSize = 8, maxSize = 16)) { username ->
       validatePassword(username) shouldBe true
     }
+  }
+
+  test("fetch user test") {
+    val user = fetchUser("sam123")
+    user.name shouldBe "sam sam"
+    user.skills.shouldContain("bare knuckle boxing")
   }
 })
 
